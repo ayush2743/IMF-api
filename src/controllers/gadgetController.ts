@@ -25,7 +25,7 @@ export const createGadget = async (req: Request, res: Response, next: NextFuncti
       throw new ValidationError("Name is required");
     } else {
       const newGadget = await GadgetService.createGadget(name);
-      res.status(201).json(newGadget);
+      res.status(201).json({newGadget, message: `Gadget has been created by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error);
@@ -47,7 +47,7 @@ export const updateGadget = async (req: Request, res: Response, next: NextFuncti
       if (status) data.status = status;
 
       const updatedGadget = await GadgetService.updateGadget(id, data);
-      res.json(updatedGadget);
+      res.json({updatedGadget, message: `Gadget has been updated by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error)
@@ -58,11 +58,15 @@ export const deleteGadget = async (req: Request, res: Response, next: NextFuncti
   try {
     const { id } = req.params;
 
+    if(req.user?.role !== "Director") {  
+      throw new ValidationError("Only Director can delete gadgets");
+    }
+
     if (!id) {
       throw new ValidationError("ID is required");
     } else {
       const updatedGadget = await GadgetService.deleteGadget(id);
-      res.json(updatedGadget);
+      res.json({updatedGadget, message: `Gadget has been decommissioned by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error)
@@ -80,7 +84,7 @@ export const selfDestructGadget = async (req: Request, res: Response, next: Next
       throw new ValidationError("Confirmation code is required");
     } else {
       const updatedGadget = await GadgetService.selfDestructGadget(id, confirmationcode);
-      res.json(updatedGadget);
+      res.json({updatedGadget, message: `Gadget has been destroyed by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error);

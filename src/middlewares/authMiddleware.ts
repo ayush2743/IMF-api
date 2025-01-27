@@ -1,11 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { ValidationError } from "../utils/error";
 
 const JWT_SECRET = process.env.JWT_SECRET || "";
 
-export interface RequestWithUserId extends Request {
-  user: object; 
+interface User {
+  id: number;
+  name: string;
+  role: string;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
 }
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
@@ -17,9 +27,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
       throw new ValidationError("Authentication Token required");
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET) as User;
 
-    (req as RequestWithUserId).user = decoded;
+    req.user = decoded;
     next();
 
   } catch (error) {
