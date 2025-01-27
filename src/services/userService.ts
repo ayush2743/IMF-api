@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "heeloo" as string;
+const JWT_SECRET = process.env.JWT_SECRET || "";
 
 export const signUp = async (name: string, email: string, password: string, role: UserRole) => {
   try {
@@ -23,7 +23,7 @@ export const signUp = async (name: string, email: string, password: string, role
     );
     
     return {user, token};
-    
+
   } catch (error) {
     throw error;
   }

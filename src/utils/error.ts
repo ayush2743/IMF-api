@@ -1,3 +1,5 @@
+import { JsonWebTokenError } from "jsonwebtoken";
+
 export class NotFoundError extends Error {
   constructor(message: string) {
     super(message);

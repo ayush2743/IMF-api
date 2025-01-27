@@ -9,10 +9,12 @@ import {
 } from "../controllers/gadgetController";
 
 import { errorHandler } from "../middlewares/errorHandler";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 
 const router = express.Router();
 
+router.use(authMiddleware);
 router.get("/", getGadgets);
 router.post("/", createGadget);
 router.patch("/:id", updateGadget);

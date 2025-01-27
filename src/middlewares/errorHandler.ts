@@ -1,10 +1,16 @@
 import { Prisma } from "@prisma/client";
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 
 export const errorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
 
   console.log(err);
+
+  if(err instanceof JsonWebTokenError) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
   if (err.name === "NotFoundError") {
     res.status(404).json({ error: err.message });
