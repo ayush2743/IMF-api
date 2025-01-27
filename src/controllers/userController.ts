@@ -1,35 +1,33 @@
-import { Request, Response } from "express";
-import { Prisma, PrismaClient, UserRole, User } from "@prisma/client";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { signUp, signIn } from "../services/userService";
+import { NextFunction, Request, Response } from "express";
+import * as UserService from "../services/userService";
+import { NotFoundError, ValidationError } from "../utils/error";
 
-export const SignUp = async (req: Request, res: Response) => {
+export const SignUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, email, password, role } = req.body;
+
     if (!name || !email || !password || !role) {
-      res.status(400).json({ error: "Missing required fields" });
-      return;
+      throw new ValidationError("Name, Email, Password and Role required"); 
     }
-    const user = await signUp(name, email, password, role);
-    res.json(user);
-  } catch (error: any) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      res.status(400).json({ error: "Email already in use" });
-    }
-    res.status(500).json({ error: error.message });
+
+    const {user, token} = await UserService.signUp(name, email, password, role);
+
+    res.json({message: "SignUp successful!", user, token});
+  } catch (error) {
+    next(error)
   }
 }
 
-export const SignIn = async (req: Request, res: Response): Promise<void> => {
+export const SignIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
-      res.status(400).json({ error: "Missing required fields" });
+      throw new ValidationError("Email and Password required");
     }
-    const token = await signIn(email, password);
-    res.json({ token });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    const token = await UserService.signIn(email, password);
+    res.json({message: "SignIn successful!", token});
+  } catch (error) {
+    next(error)
   }
 }

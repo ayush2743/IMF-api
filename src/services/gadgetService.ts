@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient, GadgetStatus } from "@prisma/client";
 import { generateCodename } from "../utils/generateCodename";
 import { generateConfirmationCode } from "../utils/generateConfirmationCode";
+import { NotFoundError, ValidationError } from "../utils/error";
+
 
 const prisma = new PrismaClient();
 
@@ -17,7 +19,7 @@ export const getAllGadgets = async (status : GadgetStatus) => {
   
 
   if (!gadgets.length) {
-    throw new Error("No gadgets found");
+    throw new NotFoundError("No gadgets found");
   }
 
   return gadgets.map((gadget) => ({
@@ -35,11 +37,6 @@ export const createGadget = async (name: string) => {
       data: { name, codename, confirmationcode },
     });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        throw new Error("A gadget with this name already exists");
-      }
-    }
     throw error;
   }
 };
@@ -70,11 +67,11 @@ export const selfDestructGadget = async (id: string, confirmationcode: string) =
   });
 
   if (!gadget) {
-    throw new Error("Gadget not found");
+    throw new NotFoundError("Gadget not found");
   }
 
   if (gadget.confirmationcode !== Number(confirmationcode)) {
-    throw new Error("Invalid confirmation code");
+    throw new ValidationError("Invalid confirmation code");
   }
 
   return await prisma.gadget.update({
