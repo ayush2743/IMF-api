@@ -1,0 +1,535 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "IMF Mission API",
+    "description": "A RESTful API for managing IMF mission gadgets and users",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://imf-api-zn64.onrender.com",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter your JWT token"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["Director", "TeamLead", "FieldAgent"]
+          }
+        }
+      },
+      "Gadget": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "codename": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Available", "Deployed", "Destroyed", "Decommissioned"]
+          },
+          "confirmationcode": {
+            "type": "integer"
+          },
+          "decommissionedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "missionSuccessProbability": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SignUpResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "SignInResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "GadgetResponse": {
+        "type": "object",
+        "properties": {
+          "updatedGadget": {
+            "$ref": "#/components/schemas/Gadget"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/user/signup": {
+      "post": {
+        "summary": "Create a new user account",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password", "role"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["Director", "TeamLead", "FieldAgent"]
+                  }
+                }
+              },
+              "example": {
+                "name": "Ethan Hunt",
+                "email": "ethan.hunt@imf.com",
+                "password": "mission-impossible",
+                "role": "FieldAgent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignUpResponse"
+                },
+                "example": {
+                  "message": "SignUp successful!",
+                  "user": {
+                    "id": "uuid",
+                    "name": "Ethan Hunt",
+                    "email": "ethan.hunt@imf.com",
+                    "role": "FieldAgent"
+                  },
+                  "token": "jwt_token"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/signin": {
+      "post": {
+        "summary": "Authenticate an existing user",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              },
+              "example": {
+                "email": "ethan.hunt@imf.com",
+                "password": "mission-impossible"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInResponse"
+                },
+                "example": {
+                  "message": "SignIn successful!",
+                  "token": "jwt_token"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gadgets": {
+      "get": {
+        "summary": "Get all gadgets",
+        "tags": ["Gadget"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": ["Available", "Deployed", "Destroyed", "Decommissioned"]
+            },
+            "description": "Filter gadgets by status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of gadgets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Gadget"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "uuid",
+                    "name": "Explosive Gum",
+                    "codename": "The Phoenix",
+                    "status": "Available",
+                    "confirmationcode": 123456,
+                    "decommissionedAt": null,
+                    "missionSuccessProbability": "85%"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new gadget",
+        "tags": ["Gadget"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Explosive Gum"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gadget created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GadgetResponse"
+                },
+                "example": {
+                  "newGadget": {
+                    "id": "uuid",
+                    "name": "Explosive Gum",
+                    "codename": "The Phoenix",
+                    "status": "Available",
+                    "confirmationcode": 123456,
+                    "decommissionedAt": null
+                  },
+                  "message": "Gadget has been created by FieldAgent Ethan Hunt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gadgets/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Gadget ID"
+        }
+      ],
+      "patch": {
+        "summary": "Update a gadget",
+        "tags": ["Gadget"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["Available", "Deployed", "Destroyed", "Decommissioned"]
+                  }
+                }
+              },
+              "example": {
+                "name": "Updated Gum",
+                "status": "Deployed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gadget updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GadgetResponse"
+                },
+                "example": {
+                  "updatedGadget": {
+                    "id": "uuid",
+                    "name": "Updated Gum",
+                    "codename": "The Phoenix",
+                    "status": "Deployed",
+                    "confirmationcode": 123456,
+                    "decommissionedAt": null
+                  },
+                  "message": "Gadget has been updated by FieldAgent Ethan Hunt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a gadget (Director only)",
+        "tags": ["Gadget"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gadget decommissioned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GadgetResponse"
+                },
+                "example": {
+                  "updatedGadget": {
+                    "id": "uuid",
+                    "name": "Updated Gum",
+                    "codename": "The Phoenix",
+                    "status": "Decommissioned",
+                    "confirmationcode": 123456,
+                    "decommissionedAt": "2024-01-26T12:00:00.000Z"
+                  },
+                  "message": "Gadget has been decommissioned by Director Jim Phelps"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gadgets/{id}/self-destruct": {
+      "post": {
+        "summary": "Self-destruct a gadget",
+        "tags": ["Gadget"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Gadget ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["confirmationcode"],
+                "properties": {
+                  "confirmationcode": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "confirmationcode": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gadget destroyed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GadgetResponse"
+                },
+                "example": {
+                  "updatedGadget": {
+                    "id": "uuid",
+                    "name": "Updated Gum",
+                    "codename": "The Phoenix",
+                    "status": "Destroyed",
+                    "confirmationcode": 123456,
+                    "decommissionedAt": null
+                  },
+                  "message": "Gadget has been destroyed by FieldAgent Ethan Hunt"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

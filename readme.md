@@ -266,3 +266,62 @@ npm run dev
 ```
 
 The API will be available at `http://localhost:3000`
+
+<br />
+<br />
+
+## API Documentation
+
+The API documentation is available in two formats:
+
+1. **Swagger UI (Production)**: 
+   Visit [https://imf-api-zn64.onrender.com/api-docs](https://imf-api-zn64.onrender.com/api-docs) to:
+   - Explore all available endpoints
+   - Test API endpoints directly from your browser
+   - View request/response schemas
+   - Understand authentication requirements
+
+2. **Swagger UI (Local Development)**:
+   When running locally, visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+<br />
+<br />
+
+## Using Authentication
+
+### In Swagger UI
+1. First, get your JWT token by using the `/user/signin` or `/user/signup` endpoint
+2. Click the "Authorize" button at the top of the Swagger UI
+3. In the authorization popup, enter your token directly:
+   ```
+   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQwYmNhYzdiLWMzY2UtNDdjYi05YzhiLWMwNjAwNjY3OGZkYyIsIm5hbWUiOiJKb2huIERvcmUiLCJyb2xlIjoiRGlyZWN0b3IiLCJpYXQiOjE3Mzc5MTQ0NzR9.Vjt3FeumWAXlVdfoVJ-pmmF2upeS6ufcRzi5s3srA3Q
+   ```
+   Note: For Swagger UI, do not include the 'Bearer ' prefix
+
+
+<br />
+<br />
+
+
+### In Postman
+When using Postman or making direct API calls, you must include the 'Bearer ' prefix in the Authorization header:
+```
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQwYmNhYzdiLWMzY2UtNDdjYi05YzhiLWMwNjAwNjY3OGZkYyIsIm5hbWUiOiJKb2huIERvcmUiLCJyb2xlIjoiRGlyZWN0b3IiLCJpYXQiOjE3Mzc5MTQ0NzR9.Vjt3FeumWAXlVdfoVJ-pmmF2upeS6ufcRzi5s3srA3Q
+```
+
+Remember to:
+- Keep your token secure and don't share it
+- For direct API calls (Postman, curl, etc.), always include 'Bearer ' prefix
+- For Swagger UI, only paste the token without 'Bearer ' prefix
+
+<br />
+<br />
+
+## Deployed API
+
+The API is deployed and available at:
+```
+https://imf-api-zn64.onrender.com
+```
+
+You can use this base URL for all API endpoints when testing in production.

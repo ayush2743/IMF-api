@@ -21,10 +21,16 @@ declare global {
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   
   try {
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader) {
       throw new ValidationError("Authentication Token required");
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      throw new ValidationError("Invalid token format. Use 'Bearer <token>'");
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as User;
