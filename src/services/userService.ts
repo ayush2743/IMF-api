@@ -48,5 +48,5 @@ export const signIn = async (email: string, password: string) => {
     JWT_SECRET
   );
   
-  return token;
+  return {token, user};
 }

@@ -25,8 +25,8 @@ export const SignIn = async (req: Request, res: Response, next: NextFunction) =>
     if (!email || !password) {
       throw new ValidationError("Email and Password required");
     }
-    const token = await UserService.signIn(email, password);
-    res.json({message: "SignIn successful!", token});
+    const {token, user} = await UserService.signIn(email, password);
+    res.json({message: "SignIn successful!", user, token});
   } catch (error) {
     next(error)
   }

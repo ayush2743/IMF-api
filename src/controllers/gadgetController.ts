@@ -65,8 +65,8 @@ export const deleteGadget = async (req: Request, res: Response, next: NextFuncti
     if (!id) {
       throw new ValidationError("ID is required");
     } else {
-      const updatedGadget = await GadgetService.deleteGadget(id);
-      res.json({updatedGadget, message: `Gadget has been decommissioned by ${req.user?.role} ${req.user?.name}`});
+      const deletedGadget = await GadgetService.deleteGadget(id);
+      res.json({deletedGadget, message: `Gadget has been decommissioned by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error)
@@ -83,8 +83,8 @@ export const selfDestructGadget = async (req: Request, res: Response, next: Next
     } else if (!confirmationcode) {
       throw new ValidationError("Confirmation code is required");
     } else {
-      const updatedGadget = await GadgetService.selfDestructGadget(id, confirmationcode);
-      res.json({updatedGadget, message: `Gadget has been destroyed by ${req.user?.role} ${req.user?.name}`});
+      const selfDestructGadget = await GadgetService.selfDestructGadget(id, confirmationcode);
+      res.json({selfDestructGadget, message: `Gadget has been destroyed by ${req.user?.role} ${req.user?.name}`});
     }
   } catch (error) {
     next(error);

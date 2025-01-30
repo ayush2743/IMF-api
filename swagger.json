@@ -82,42 +82,6 @@
             "type": "string"
           }
         }
-      },
-      "SignUpResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
-      "SignInResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
-      "GadgetResponse": {
-        "type": "object",
-        "properties": {
-          "updatedGadget": {
-            "$ref": "#/components/schemas/Gadget"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
       }
     }
   },
@@ -171,7 +135,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SignUpResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
                   "message": "SignUp successful!",
@@ -234,10 +209,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SignInResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
                   "message": "SignIn successful!",
+                  "user": {
+                    "id": "uuid",
+                    "name": "Ethan Hunt",
+                    "email": "ethan.hunt@imf.com",
+                    "role": "FieldAgent"
+                  },
                   "token": "jwt_token"
                 }
               }
@@ -346,7 +338,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GadgetResponse"
+                  "type": "object",
+                  "properties": {
+                    "newGadget": {
+                      "$ref": "#/components/schemas/Gadget"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
                   "newGadget": {
@@ -415,7 +415,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GadgetResponse"
+                  "type": "object",
+                  "properties": {
+                    "updatedGadget": {
+                      "$ref": "#/components/schemas/Gadget"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
                   "updatedGadget": {
@@ -447,10 +455,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GadgetResponse"
+                  "type": "object",
+                  "properties": {
+                    "deletedGadget": {
+                      "$ref": "#/components/schemas/Gadget"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
-                  "updatedGadget": {
+                  "deletedGadget": {
                     "id": "uuid",
                     "name": "Updated Gum",
                     "codename": "The Phoenix",
@@ -512,10 +528,18 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GadgetResponse"
+                  "type": "object",
+                  "properties": {
+                    "selfDestructGadget": {
+                      "$ref": "#/components/schemas/Gadget"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
-                  "updatedGadget": {
+                  "selfDestructGadget": {
                     "id": "uuid",
                     "name": "Updated Gum",
                     "codename": "The Phoenix",
